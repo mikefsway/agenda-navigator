@@ -1,0 +1,50 @@
+# `tests` runs on every push and guards the repo: the Scholar parser, and — once
+# a conference has been loaded — the data files against each other. It is the
+# gate on a pipeline run. On a fresh clone data.test.mjs skips loudly, because
+# docs/data/ is a pipeline output and this repo ships without one.
+#
+# There is deliberately no `monitor` job here. test/monitor.mjs watches a
+# *deployed* site and the things it depends on that nobody controls — jsDelivr,
+# Hugging Face, the conference's own programme — and this repo has no
+# deployment. Once yours exists, add the job below on a schedule; a failing
+# scheduled workflow is the notification, since GitHub emails the repo owner.
+#
+#   monitor:
+#     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: "20"
+#       - run: node test/monitor.mjs https://you.github.io/your-conference/
+#
+# ...with `schedule: - cron: "12 7 * * *"` added to `on:`. Not on the hour:
+# GitHub queues everyone who asked for :00 together, and a monitor that runs
+# late is a monitor you stop trusting.
+
+name: check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# Neither job writes anything, and a public repo gets pull requests from people
+# whose code these jobs then run. `pull_request` (rather than
+# `pull_request_target`) already means a fork's PR gets a read-only token and no
+# secrets, so this is belt and braces — but it is the sort of default that
+# drifts, and stating it costs two lines.
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: node test/parse.test.mjs
+      - run: node test/data.test.mjs
