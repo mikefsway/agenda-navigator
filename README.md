@@ -99,6 +99,13 @@ CLAUDE.md            why the code is shaped the way it is — read before scorin
 - **Clash rule.** If the gap between the top two in a slot is in the closest
   fifth of the slots you're actually deciding, both are shown and neither is
   chosen.
+- **A brief for the user's own LLM.** The route, their profile and the top 14 of
+  every slot, copied as markdown, so they can hand it to Claude or ChatGPT and
+  get the judgement the embeddings can't do — what they've had enough of, who
+  they're avoiding, what's already in their diary. It's a second opinion on the
+  route rather than a second route. This is the one thing in the tool that sends
+  the user's text off their device, by their choice, and the caveat sits next to
+  the button. If you keep the feature, keep the caveat: `PORTING.md` §7.
 
 ## The part worth reading before you change anything
 
